@@ -1,2 +1,6 @@
-# 排除 src 文件
+# 过滤文件
 src/
+test/
+yarn.lock
+tsconfig.json
+.editorconfig
