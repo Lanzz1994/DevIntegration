@@ -2,12 +2,6 @@
   "name": "dev-integration",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "test": "mocha --reporter spec",
-    "precommit": "lint-staged"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Lanzz1994/DevIntegration.git"
@@ -18,17 +12,27 @@
     "data-structure"
   ],
   "author": "Lanzz1994",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Lanzz1994/DevIntegration/issues"
   },
   "homepage": "https://github.com/Lanzz1994/DevIntegration#readme",
+  "main": "dist/index.js",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha --reporter spec",
+    "precommit": "lint-staged"
+  },
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.4.0",
     "husky": "^3.0.5",
     "lint-staged": "^9.2.5",
     "mocha": "^6.2.0",
+    "moment": "^2.24.0",
     "prettier": "1.18.2",
     "typescript": "^3.5.2"
   },
@@ -37,5 +41,6 @@
       "tslint --fix",
       "git add"
     ]
-  }
+  },
+  "dependencies": {}
 }

@@ -1,6 +1,0 @@
-# 过滤文件
-src/
-test/
-yarn.lock
-tsconfig.json
-.editorconfig
