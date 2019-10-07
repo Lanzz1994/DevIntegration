@@ -42,5 +42,8 @@
       "git add"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/lodash": "^4.14.141",
+    "lodash": "^4.17.15"
+  }
 }
