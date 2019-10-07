@@ -1,19 +1,20 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": true,
-    "strict": true,
-    "baseUrl": ".",
-    "outDir": "./dist",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": true,
+        "strict": true,
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        },
+        "allowSyntheticDefaultImports": true
     },
-    "allowSyntheticDefaultImports": true
-  },
-  "exclude": [
-    "node_modules"
-  ]
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }
