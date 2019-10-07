@@ -1,14 +1,25 @@
+import { KeyValue } from '@/Types/Common';
+import { LoopBFS, LoopDFS } from './Traverser';
 import TreeNode from './TreeNode';
-import { LoopBFS } from './Traverser';
 
 export default class Tree<T = any> {
 
-    _root?: TreeNode<T>
-    _current?: TreeNode<T>
+    _root?: TreeNode<T>;
+    _current?: TreeNode<T>;
 
-    get Root() { return this._root; }
-    get Current() { return this._current; }
-    get IsEmpty() { return !this._root && !this._current; }
+    get Root() {
+        return this._root;
+    }
+    get Current() {
+        return this._current;
+    }
+    get IsEmpty() {
+        return !this._root && !this._current;
+    }
+
+    constructor(data?: T) {
+        data && this.Insert(data);
+    }
 
     Insert(data: T) {
         let node = new TreeNode(data);
@@ -27,46 +38,96 @@ export default class Tree<T = any> {
         return node;
     }
 
-    Remove(node: TreeNode<T>, removeChildren: boolean = true) {
+    InsertToNode(node: TreeNode<T>, data: T) {
+        let newNode = new TreeNode(data);
+        newNode._parent = node;
+        newNode._depth = newNode._parent._depth + 1;
+        node._children.push(newNode);
+        this._current = newNode;
+        return newNode;
+    }
+
+    InsertToFind(find: (current: T) => boolean, data: T) {
+        if (this._root) {
+            let targetNode = this.FindNode(find, this._root);
+            if (targetNode) return this.InsertToNode(targetNode, data);
+        }
+    }
+
+    Remove(node: TreeNode<T>, trim: boolean = true) {
         if (node._parent) {
-            if ((this._root && node._id === this._root._id) || removeChildren) {
+            if (trim || node === this._root) {
                 this.TrimBranchFrom(node);
             } else {
-
                 // Upate children's parent to grandparent
                 node._children.forEach(child => {
                     child._parent = node._parent;
                     (node._parent as TreeNode)._children.push(child);
                 });
 
-                // // Delete itslef from parent child array
-                node._parent._children.splice(node._parent._children.findIndex(c => c._id === node._id), 1);
+                // Delete itslef from parent child array
+                node._parent._children.splice(node._parent._children.indexOf(node), 1);
 
-                // // Update Current Node
+                // Update Current Node
                 this._current = node._parent;
 
                 // Clear Child Array
-                node._children = [];
+                // node._children = [];
+                node._children.length = 0;
                 node._parent = undefined;
-                node._data = undefined;
+                node._data = undefined as any;
             }
-        } else {
-            throw new Error('treeNode hasn\'t in tree');
         }
     }
 
     TrimBranchFrom(node: TreeNode<T>) {
-        LoopBFS([node], (current) => {
-            current._data = undefined;
-            current._children = [];
+        LoopBFS([node], current => {
+            current._data = undefined as any;
+            //current._children = [];
+            current._children.length = 0;
         });
 
         if (node._parent) {
             // 大数据量的处理瓶颈
-            node._parent._children.splice(node._parent._children.findIndex(c => c._id === node._id), 1);
+            node._parent._children.splice(node._parent._children.indexOf(node), 1);
             this._current = node._parent;
         } else {
             this._root = this._current = undefined;
         }
     }
+
+    FindNode(find: (current: T) => boolean, node: TreeNode): TreeNode<T> | null {
+        let targetNode = null;
+        LoopDFS(node, (current) => {
+            if (find(current._data)) {
+                targetNode = current;
+                return false;
+            }
+            return true;
+        });
+        return targetNode;
+    }
+
+    Export(format?: (current?: T) => KeyValue) {
+        if (this._root) {
+            return this.ExportNode(this._root, format);
+        }
+    }
+
+    ExportNode(node: TreeNode, format?: (current?: T) => KeyValue) {
+        let result: KeyValue = { children: [] };
+        LoopDFS(node, (current, parent) => {
+            let fmt = format
+                ? format(current._data)
+                : current._data;
+            fmt.children = [];
+            if (parent) parent.children.push(fmt);
+            return fmt;
+        }, result);
+        return result.children[0];
+    }
+
+    Import() { }
+
+    ImportToNode() { }
 }
