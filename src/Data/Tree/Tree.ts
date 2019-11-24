@@ -1,4 +1,4 @@
-import { KeyValue } from '@/Types/Common';
+import { KV } from '../../Types/Common';
 import { LoopBFS, LoopDFS } from './Traverser';
 import TreeNode from './TreeNode';
 
@@ -108,14 +108,14 @@ export default class Tree<T = any> {
         return targetNode;
     }
 
-    Export(format?: (current?: T) => KeyValue) {
+    Export(format?: (current?: T) => KV) {
         if (this._root) {
             return this.ExportNode(this._root, format);
         }
     }
 
-    ExportNode(node: TreeNode, format?: (current?: T) => KeyValue) {
-        let result: KeyValue = { children: [] };
+    ExportNode(node: TreeNode, format?: (current?: T) => KV) {
+        let result: KV = { children: [] };
         LoopDFS(node, (current, parent) => {
             let fmt = format
                 ? format(current._data)

@@ -1,20 +1,24 @@
-import { KeyValue } from '@/Types/Common';
+import { KV } from '../../Types/Common';
+import { LoopDFSTail } from './Utils';
 export declare type NullableLinkedTree = LinkedTree | undefined;
 export declare type LinkedTreeParams = {
     parent?: LinkedTree;
     children?: LinkedTree;
     deep?: boolean;
 };
-export declare type TreeFormat<T> = {
+export interface ILinkedTreeRaw<T = any> {
     Data: T;
-    Children: TreeFormat<T>[];
-};
-export declare type TreeFormatOptions<T> = {
-    format?: (data: T) => KeyValue;
+    Children: ILinkedTreeRaw<T>[];
+}
+export declare type FormatOptions<T> = {
+    format?: (data: T) => KV;
     childrenField?: string;
-    useTreeFormat?: boolean;
+    useTreeForamt?: boolean;
 };
-export interface ILinkedTree<T> {
+export declare type ImportOptions<T> = {
+    coverRoot?: boolean;
+} & FormatOptions<T>;
+export interface ILinkedTree<T> extends ILinkedTreeRaw {
     Data: T;
     Parent?: ILinkedTree<T>;
     Prev?: ILinkedTree<T>;
@@ -42,6 +46,8 @@ export default class LinkedTree<T = any> implements ILinkedTree<T> {
     readonly IsLeaf: boolean;
     readonly SubLength: number;
     constructor(data: T, params?: LinkedTreeParams);
+    /** 尾递归遍历 */
+    static LoopDFSTail: typeof LoopDFSTail;
     /**
      * Adds the specified new tree at the start of children of this
      * @returns added node
@@ -80,6 +86,7 @@ export default class LinkedTree<T = any> implements ILinkedTree<T> {
     MoveToReplace(target: LinkedTree): this;
     RemoveSelf(): void;
     Clear(): void;
-    Export({ format, childrenField, useTreeFormat }: TreeFormatOptions<T>): any;
-    Import(tree: KeyValue, { childrenField, useTreeFormat }: Exclude<TreeFormatOptions<T>, 'format'>): any;
+    Map(callback: (current: LinkedTree<T>, children: any[]) => any): any;
+    Export({ format, childrenField, useTreeForamt }?: FormatOptions<T>): any;
+    Import(source: KV | KV[], { format, childrenField, useTreeForamt, coverRoot }?: ImportOptions<T>): this;
 }

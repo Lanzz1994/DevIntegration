@@ -1,4 +1,4 @@
-import { KeyValue } from '@/Types/Common';
+import { KV } from '../../Types/Common';
 import TreeNode from './TreeNode';
 export default class Tree<T = any> {
     _root?: TreeNode<T>;
@@ -13,8 +13,8 @@ export default class Tree<T = any> {
     Remove(node: TreeNode<T>, trim?: boolean): void;
     TrimBranchFrom(node: TreeNode<T>): void;
     FindNode(find: (current: T) => boolean, node: TreeNode): TreeNode<T> | null;
-    Export(format?: (current?: T) => KeyValue): any;
-    ExportNode(node: TreeNode, format?: (current?: T) => KeyValue): any;
+    Export(format?: (current?: T) => KV): any;
+    ExportNode(node: TreeNode, format?: (current?: T) => KV): any;
     Import(): void;
     ImportToNode(): void;
 }

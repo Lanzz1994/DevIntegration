@@ -1,1 +1,1 @@
-export default function GUID(): string;
+export declare function GUID(): string;

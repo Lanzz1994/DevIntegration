@@ -30,7 +30,7 @@ function setLast(tree, target) {
 exports.setLast = setLast;
 function setAfter(tree, target) {
     if (target._parent) {
-        var next = target._next;
+        let next = target._next;
         tree._prev = target;
         if (next) {
             tree._next = next;
@@ -46,7 +46,7 @@ function setAfter(tree, target) {
 exports.setAfter = setAfter;
 function setBefore(tree, target) {
     if (target._parent) {
-        var prev = target._prev;
+        let prev = target._prev;
         tree._next = target;
         if (prev) {
             tree._prev = prev;
@@ -95,7 +95,7 @@ function insert(tree, target) {
 exports.insert = insert;
 function remove(tree) {
     if (tree._parent) {
-        var index = tree._parent._children.indexOf(tree);
+        let index = tree._parent._children.indexOf(tree);
         if (index > -1) {
             tree._parent._children.splice(index, 1);
             cutLinked(tree);

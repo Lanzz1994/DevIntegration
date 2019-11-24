@@ -1,4 +1,4 @@
-import { KeyValue } from '@/Types/Common';
+import { KV } from '../../Types/Common';
 
 export type LoopHandleResult<T = any> = {
     parent?: T,
@@ -8,9 +8,9 @@ export type LoopHandleResult<T = any> = {
 }
 
 export function LoopDFS(
-    tree: KeyValue,
+    tree: KV,
     childFiled: string,
-    handle: (current: KeyValue, parentResult?: LoopHandleResult) => any,
+    handle: (current: KV, parentResult?: LoopHandleResult) => any,
     handleResult?: LoopHandleResult
 ) {
     const children = (tree[childFiled] || []) as [];
@@ -22,9 +22,9 @@ export function LoopDFS(
 }
 
 export function LoopDFSTail(
-    tree: KeyValue,
+    tree: KV,
     childFiled: string,
-    handle: (current: KeyValue, childrenResults: LoopHandleResult[]) => any
+    handle: (current: KV, childrenResults: LoopHandleResult[]) => any
 ) {
 
     const children = (tree[childFiled] || []) as [],

@@ -1,9 +1,9 @@
 
 import omit from 'lodash/omit';
 import cloneDeep from 'lodash/cloneDeep';
-import { KeyValue } from '@/Types/Common';
-import { LoopDFSTail } from './Util';
-import { LoopDFSTail as TreeLoopDFSTail } from '../Tree/Util';
+import { KV } from '../../Types/Common';
+import { LoopDFSTail, Bubble } from './Utils';
+import { LoopDFSTail as TreeLoopDFSTail } from '../Tree/Utils';
 import { insert, setFirst, setLast, remove, setBefore, setAfter, destroy } from './_utils';
 
 export type NullableLinkedTree = LinkedTree | undefined;
@@ -14,18 +14,22 @@ export type LinkedTreeParams = {
     deep?: boolean
 };
 
-export type TreeFormat<T> = {
+export interface ILinkedTreeRaw<T = any> {
     Data: T;
-    Children: TreeFormat<T>[];
+    Children: ILinkedTreeRaw<T>[];
 }
 
-export type TreeFormatOptions<T> = {
-    format?: (data: T) => KeyValue,
+export type FormatOptions<T> = {
+    format?: (data: T) => KV,
     childrenField?: string,
-    useTreeFormat?: boolean
+    useTreeForamt?: boolean
 }
 
-export interface ILinkedTree<T> {
+export type ImportOptions<T> = {
+    coverRoot?: boolean
+} & FormatOptions<T>;
+
+export interface ILinkedTree<T> extends ILinkedTreeRaw {
     Data: T;
     Parent?: ILinkedTree<T>;
     Prev?: ILinkedTree<T>;
@@ -68,6 +72,9 @@ export default class LinkedTree<T = any> implements ILinkedTree<T> {
             if (params.children) this.AddFirst(params.children);
         }
     }
+
+    /** 尾递归遍历 */
+    static LoopDFSTail = LoopDFSTail
 
     //=================== Add =====================
     /**
@@ -166,12 +173,26 @@ export default class LinkedTree<T = any> implements ILinkedTree<T> {
 
     Clear() {
         LoopDFSTail(this, (cureent) => {
+            destroy(cureent);
             cureent._children.length = 0;
         });
     }
 
     //=================== Util =====================
-    Export({ format, childrenField = 'Children', useTreeFormat = true }: TreeFormatOptions<T>) {
+    HasAncestor(target: LinkedTree) {
+        let has = false;
+        Bubble(this, (current) => {
+            has = current === target;
+            return !has;
+        });
+        return has;
+    }
+
+    Map(callback: (current: LinkedTree<T>, children: any[]) => any) {
+        return LoopDFSTail(this, (current, childrenResults) => callback(current, childrenResults));
+    }
+
+    Export({ format, childrenField = 'Children', useTreeForamt = true }: FormatOptions<T> = {}) {
 
         let result = LoopDFSTail(this, (current, childrenResults) => {
             let fmt = format
@@ -180,7 +201,7 @@ export default class LinkedTree<T = any> implements ILinkedTree<T> {
 
             let Children = childrenResults.map(res => res.fmtValue);
 
-            let fmtValue = useTreeFormat === false
+            let fmtValue = useTreeForamt === false
                 ? { Data: fmt, Children }
                 : { ...fmt, [childrenField]: Children };
 
@@ -190,21 +211,29 @@ export default class LinkedTree<T = any> implements ILinkedTree<T> {
         return result.fmtValue;
     }
 
-    Import(tree: KeyValue, { childrenField = 'Children', useTreeFormat = true }: Exclude<TreeFormatOptions<T>, 'format'>) {
-        let result = TreeLoopDFSTail(tree, childrenField, (current, childrenResults) => {
+    Import(source: KV | KV[], { format, childrenField = 'Children', useTreeForamt = true, coverRoot }: ImportOptions<T> = {}) {
+
+        const sourceIsArray = Array.isArray(source);
+
+        let result = TreeLoopDFSTail(sourceIsArray ? { [childrenField]: source } : source, childrenField, (current, childrenResults) => {
 
             let tree = new LinkedTree(
-                useTreeFormat
+                useTreeForamt
                     ? current.Data
-                    : omit(current, childrenField)
+                    : format
+                        ? format(current.Data)
+                        : omit(current, childrenField)
             );
 
             childrenResults.forEach(res => tree.AddLast(res.tree));
 
             return { tree };
-        });
+        }) as { tree: LinkedTree };
 
-        return result.tree;
+        result.tree.Children.forEach((v) => this.AddLast(v));
+
+        !sourceIsArray && coverRoot && (this.Data = result.tree.Data);
+
+        return this;
     }
-
 }

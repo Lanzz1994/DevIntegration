@@ -1,34 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Traverser_1 = require("./Traverser");
-var TreeNode_1 = require("./TreeNode");
-var Tree = /** @class */ (function () {
-    function Tree(data) {
+const Traverser_1 = require("./Traverser");
+const TreeNode_1 = require("./TreeNode");
+class Tree {
+    constructor(data) {
         data && this.Insert(data);
     }
-    Object.defineProperty(Tree.prototype, "Root", {
-        get: function () {
-            return this._root;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Tree.prototype, "Current", {
-        get: function () {
-            return this._current;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Tree.prototype, "IsEmpty", {
-        get: function () {
-            return !this._root && !this._current;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Tree.prototype.Insert = function (data) {
-        var node = new TreeNode_1.default(data);
+    get Root() {
+        return this._root;
+    }
+    get Current() {
+        return this._current;
+    }
+    get IsEmpty() {
+        return !this._root && !this._current;
+    }
+    Insert(data) {
+        let node = new TreeNode_1.default(data);
         if (this.IsEmpty) {
             node._depth = 1;
             this._root = this._current = node;
@@ -42,31 +30,30 @@ var Tree = /** @class */ (function () {
             node._depth = node._parent._depth + 1;
         }
         return node;
-    };
-    Tree.prototype.InsertToNode = function (node, data) {
-        var newNode = new TreeNode_1.default(data);
+    }
+    InsertToNode(node, data) {
+        let newNode = new TreeNode_1.default(data);
         newNode._parent = node;
         newNode._depth = newNode._parent._depth + 1;
         node._children.push(newNode);
         this._current = newNode;
         return newNode;
-    };
-    Tree.prototype.InsertToFind = function (find, data) {
+    }
+    InsertToFind(find, data) {
         if (this._root) {
-            var targetNode = this.FindNode(find, this._root);
+            let targetNode = this.FindNode(find, this._root);
             if (targetNode)
                 return this.InsertToNode(targetNode, data);
         }
-    };
-    Tree.prototype.Remove = function (node, trim) {
-        if (trim === void 0) { trim = true; }
+    }
+    Remove(node, trim = true) {
         if (node._parent) {
             if (trim || node === this._root) {
                 this.TrimBranchFrom(node);
             }
             else {
                 // Upate children's parent to grandparent
-                node._children.forEach(function (child) {
+                node._children.forEach(child => {
                     child._parent = node._parent;
                     node._parent._children.push(child);
                 });
@@ -81,9 +68,9 @@ var Tree = /** @class */ (function () {
                 node._data = undefined;
             }
         }
-    };
-    Tree.prototype.TrimBranchFrom = function (node) {
-        Traverser_1.LoopBFS([node], function (current) {
+    }
+    TrimBranchFrom(node) {
+        Traverser_1.LoopBFS([node], current => {
             current._data = undefined;
             //current._children = [];
             current._children.length = 0;
@@ -96,10 +83,10 @@ var Tree = /** @class */ (function () {
         else {
             this._root = this._current = undefined;
         }
-    };
-    Tree.prototype.FindNode = function (find, node) {
-        var targetNode = null;
-        Traverser_1.LoopDFS(node, function (current) {
+    }
+    FindNode(find, node) {
+        let targetNode = null;
+        Traverser_1.LoopDFS(node, (current) => {
             if (find(current._data)) {
                 targetNode = current;
                 return false;
@@ -107,16 +94,16 @@ var Tree = /** @class */ (function () {
             return true;
         });
         return targetNode;
-    };
-    Tree.prototype.Export = function (format) {
+    }
+    Export(format) {
         if (this._root) {
             return this.ExportNode(this._root, format);
         }
-    };
-    Tree.prototype.ExportNode = function (node, format) {
-        var result = { children: [] };
-        Traverser_1.LoopDFS(node, function (current, parent) {
-            var fmt = format
+    }
+    ExportNode(node, format) {
+        let result = { children: [] };
+        Traverser_1.LoopDFS(node, (current, parent) => {
+            let fmt = format
                 ? format(current._data)
                 : current._data;
             fmt.children = [];
@@ -125,9 +112,8 @@ var Tree = /** @class */ (function () {
             return fmt;
         }, result);
         return result.children[0];
-    };
-    Tree.prototype.Import = function () { };
-    Tree.prototype.ImportToNode = function () { };
-    return Tree;
-}());
+    }
+    Import() { }
+    ImportToNode() { }
+}
 exports.default = Tree;

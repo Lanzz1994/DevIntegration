@@ -33,3 +33,11 @@ export function LoopDFSTail(
     }
     return handle(tree, currentResults);
 }
+
+export function Bubble(tree: LinkedTree, handle: (current: LinkedTree) => boolean | void) {
+    let top: LinkedTree = tree;
+    while (top._parent) {
+        if (handle(top) === false) break;
+        top = top._parent;
+    }
+}
